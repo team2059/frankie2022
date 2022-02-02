@@ -46,12 +46,18 @@ public class DriveTrainSubsystem extends SubsystemBase {
 
   /** Creates a new DriveTrain. */
   public DriveTrainSubsystem() {
-  
+
+    leftBackCANSparkMax.restoreFactoryDefaults();
+    leftFrontCANSparkMax.restoreFactoryDefaults();
+    rightFrontCANSparkMax.restoreFactoryDefaults();
+    rightBackCANSparkMax.restoreFactoryDefaults();
+
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
     // leftMotorControllerGroup.setInverted(true);
-    // rightMotorControllerGroup.setInverted(true);
+
+
     // kLinearDistancePerMotorRotation = gear
     // ratio*2*pi*Units.inchesToMeters(wheel raidus)
     // velocity is / 60 to go from meters/minute to meters/second
@@ -94,6 +100,14 @@ public class DriveTrainSubsystem extends SubsystemBase {
    *
    * @return The pose.
    */
+
+  public void setIdleMode() {
+    leftBackCANSparkMax.setIdleMode(IdleMode.kCoast);
+    leftFrontCANSparkMax.setIdleMode(IdleMode.kCoast);
+    rightBackCANSparkMax.setIdleMode(IdleMode.kCoast);
+    rightFrontCANSparkMax.setIdleMode(IdleMode.kCoast);
+  }
+
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
   }
@@ -177,8 +191,6 @@ public class DriveTrainSubsystem extends SubsystemBase {
   // return m_leftEncoder;
   // }
 
-  // TODO: See what difference is in returning Encoder object vs RelativeEncoder
-  // object
   public RelativeEncoder getLeftEncoder() {
     return leftRelativeEncoder;
   }
@@ -207,6 +219,16 @@ public class DriveTrainSubsystem extends SubsystemBase {
    */
   public void setMaxOutput(double maxOutput) {
     differentialDrive.setMaxOutput(maxOutput);
+  }
+
+  // SPARK MAX will effectively short all motor wires together. This quickly
+  // dissipates any electrical energy within the motor and brings it to a quick
+  // stop.
+  public void setBreakMode() {
+    leftBackCANSparkMax.setIdleMode(IdleMode.kBrake);
+    leftFrontCANSparkMax.setIdleMode(IdleMode.kBrake);
+    rightFrontCANSparkMax.setIdleMode(IdleMode.kBrake);
+    rightBackCANSparkMax.setIdleMode(IdleMode.kBrake);
   }
 
   /** Zeroes the heading of the robot. */
