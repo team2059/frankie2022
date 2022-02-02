@@ -28,8 +28,8 @@ public final class Constants {
         public static final double kRamseteZeta = 0.7;
 
         // for paths that are coded. in pathweaver we can set these values
-        public static final double kMaxSpeedMetersPerSecond = 0;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 0;
+        public static final double kMaxSpeedMetersPerSecond = 1;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 1;
 
     }
 
@@ -43,21 +43,22 @@ public final class Constants {
         //
         // ratio*2*pi*Units.inchesToMeters(wheel raidus)
         public static final double kFrankieGearRatio = 12.755;
-        public static final double kFrankieWheelRadiusInches = 3.1875;
+        public static final double kFrankieWheelRadiusInches = 3;
 
         // If we get the number of ticks, say 10000, we want to multiply that times
         // 1/kLinearDistancePerMotorRotation to get number of inches, not 10000 times
         // kLinearDistancePerMotorRotation
-        public static final double kLinearDistancePerMotorRotation = 1 / (kFrankieGearRatio * 2 * Math.PI
-                * Units.inchesToMeters(kFrankieWheelRadiusInches));
+        public static final double kLinearDistancePerMotorRotation = Units
+                .inchesToMeters(1 / (kFrankieGearRatio * 2 * Math.PI
+                        * Units.inchesToMeters(kFrankieWheelRadiusInches)) * 10);
 
         // TODO: run robot characerization. The Robot Characterization Toolsuite
         // provides a convenient tool for obtaining these
         // values for your robot.
-        public static final double ksVolts = 0;
-        public static final double kvVoltSecondsPerMeter = 0;
-        public static final double kaVoltSecondsSquaredPerMeter = 0;
-        public static final double kPDriveVel = 0;
+        public static final double ksVolts = 0.17404;
+        public static final double kvVoltSecondsPerMeter = 3.4402;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.31508;
+        public static final double kPDriveVel = 3;
 
         // 22.75 inches equals 0.57785. trackwidth is horizontal distance between the
         // wheels
