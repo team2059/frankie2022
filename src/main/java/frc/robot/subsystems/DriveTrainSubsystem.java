@@ -4,18 +4,20 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 
@@ -44,13 +46,12 @@ public class DriveTrainSubsystem extends SubsystemBase {
 
   /** Creates a new DriveTrain. */
   public DriveTrainSubsystem() {
+  
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-
-    // commented out set inverted due to correct wiring on frankie
+    // leftMotorControllerGroup.setInverted(true);
     // rightMotorControllerGroup.setInverted(true);
-
     // kLinearDistancePerMotorRotation = gear
     // ratio*2*pi*Units.inchesToMeters(wheel raidus)
     // velocity is / 60 to go from meters/minute to meters/second
@@ -74,12 +75,15 @@ public class DriveTrainSubsystem extends SubsystemBase {
 
     // TODO: Find what getDistance() returns and see if it is the same as
     // getPosition()
+    SmartDashboard.putNumber("Left encoder value in meters", leftRelativeEncoder.getPosition());
+    SmartDashboard.putNumber("Right encoder value in meters", rightRelativeEncoder.getPosition());
+    SmartDashboard.putNumber("Gyro heading in Degrees ", m_gyro.getRotation2d().getDegrees());
+
     m_odometry.update(m_gyro.getRotation2d(), leftRelativeEncoder.getPosition(), rightRelativeEncoder.getPosition());
   }
 
-  // TODO: Attach ADXRS450_Gyro to frankie via middle connector pins in RoboRIO
   // The gyro sensor
-  private final Gyro m_gyro = new ADXRS450_Gyro();
+  private final Gyro m_gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
