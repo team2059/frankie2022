@@ -4,48 +4,78 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.SPI;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import frc.robot.Constants.DriveConstants;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
+
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 
 public class DriveTrainSubsystem extends SubsystemBase {
 
-  CANSparkMax leftFrontCANSparkMax = new CANSparkMax(DriveConstants.leftFrontCANSparkMaxCANId,
+  static CANSparkMax leftFrontCANSparkMax = new CANSparkMax(DriveConstants.leftFrontCANSparkMaxCANId,
       CANSparkMaxLowLevel.MotorType.kBrushless);
   CANSparkMax leftBackCANSparkMax = new CANSparkMax(DriveConstants.leftbackCANSparkMaxCANId,
       CANSparkMaxLowLevel.MotorType.kBrushless);
-  CANSparkMax rightFrontCANSparkMax = new CANSparkMax(DriveConstants.rightFrontCANSparkMaxCANId,
+  static CANSparkMax rightFrontCANSparkMax = new CANSparkMax(DriveConstants.rightFrontCANSparkMaxCANId,
       CANSparkMaxLowLevel.MotorType.kBrushless);
   CANSparkMax rightBackCANSparkMax = new CANSparkMax(DriveConstants.rightBackCANSparkMaxCANId,
       CANSparkMaxLowLevel.MotorType.kBrushless);
 
   // using built in encoders in NEO motors
-  private final RelativeEncoder leftRelativeEncoder = leftFrontCANSparkMax.getEncoder();
-  private final RelativeEncoder rightRelativeEncoder = rightFrontCANSparkMax.getEncoder();
+  private final static RelativeEncoder leftRelativeEncoder = leftFrontCANSparkMax.getEncoder();
+
+  // NEGATIVE RIGHT ENCODER VALUE!!!!!!!!!!!
+  public final static RelativeEncoder rightRelativeEncoder = rightFrontCANSparkMax.getEncoder();
 
   private final MotorControllerGroup leftMotorControllerGroup = new MotorControllerGroup(leftFrontCANSparkMax,
       leftBackCANSparkMax);
-  private final MotorControllerGroup rightMotorControllerGroup = new MotorControllerGroup(rightFrontCANSparkMax,
+  public final MotorControllerGroup rightMotorControllerGroup = new MotorControllerGroup(rightFrontCANSparkMax,
       rightBackCANSparkMax);
 
   private final DifferentialDrive differentialDrive = new DifferentialDrive(leftMotorControllerGroup,
       rightMotorControllerGroup);
 
+  private Field2d m_field = new Field2d();
+
+  public Field2d getField() {
+    return m_field;
+  }
+
   /** Creates a new DriveTrain. */
   public DriveTrainSubsystem() {
+
+    SmartDashboard.putData("Field", m_field);
+
+    leftRelativeEncoder.setPosition(0);
+    rightRelativeEncoder.setPosition(0);
+    navX.reset();
+    navX.calibrate();
+
+    rightMotorControllerGroup.setInverted(true);
+    // leftMotorControllerGroup.setInverted(true);
+    // leftMotorControllerGroup.setInverted(true);
+
+    // TODO: check if right and left encoders need to be inverted. forward makes
+    // left encoder go postive while right goes negative.
 
     leftBackCANSparkMax.restoreFactoryDefaults();
     leftFrontCANSparkMax.restoreFactoryDefaults();
@@ -57,42 +87,77 @@ public class DriveTrainSubsystem extends SubsystemBase {
     // gearbox is constructed, you might have to invert the left side instead.
     // leftMotorControllerGroup.setInverted(true);
 
-
     // kLinearDistancePerMotorRotation = gear
     // ratio*2*pi*Units.inchesToMeters(wheel raidus)
     // velocity is / 60 to go from meters/minute to meters/second
     // kLinearDistancePerMotorRotation and velocity is / 60 to go from meters/minute
     // to meters/second
+
     rightRelativeEncoder.setPositionConversionFactor(DriveConstants.kLinearDistancePerMotorRotation);
     leftRelativeEncoder.setPositionConversionFactor(DriveConstants.kLinearDistancePerMotorRotation);
     rightRelativeEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistancePerMotorRotation / 60);
     leftRelativeEncoder.setVelocityConversionFactor(DriveConstants.kLinearDistancePerMotorRotation / 60);
 
     resetEncoders();
-    m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+    m_odometry = new DifferentialDriveOdometry(navX.getRotation2d());
   }
 
   @Override
   public void periodic() {
+    m_field.setRobotPose(m_odometry.getPoseMeters());
+
     // This method will be called once per scheduler run
-    // m_odometry.update(
-    // m_gyro.getRotation2d(), m_leftEncoder.getDistance(),
-    // m_rightEncoder.getDistance());
+    SmartDashboard.putNumber("Left encoder value in meters", getLeftEncoderPosition());
 
-    // TODO: Find what getDistance() returns and see if it is the same as
-    // getPosition()
-    SmartDashboard.putNumber("Left encoder value in meters", leftRelativeEncoder.getPosition());
-    SmartDashboard.putNumber("Right encoder value in meters", rightRelativeEncoder.getPosition());
-    SmartDashboard.putNumber("Gyro heading in Degrees ", m_gyro.getRotation2d().getDegrees());
+    // NEGATE RIGHT ENCODER VALUE!!!!!!!!!!!
+    SmartDashboard.putNumber("Right encoder value in meters", getRightEncoderPosition());
+    SmartDashboard.putNumber("Gyro heading", getHeading());
 
-    m_odometry.update(m_gyro.getRotation2d(), leftRelativeEncoder.getPosition(), rightRelativeEncoder.getPosition());
+    // NEGATE RIGHT ENCODER VALUE!!!!!!!!!!!
+    m_odometry.update(navX.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition());
+
+  }
+
+  public MotorControllerGroup getLeftMotorControllerGroup() {
+    return leftMotorControllerGroup;
+  }
+
+  // NEGATE RIGHT ENCODER VALUE!!!!!!!!!!!
+  public double getRightEncoderPosition() {
+    return rightRelativeEncoder.getPosition();
+  }
+
+  public double getLeftEncoderPosition() {
+    return -leftRelativeEncoder.getPosition();
+  }
+
+  public double getRightEncoderVelocity() {
+    return rightRelativeEncoder.getVelocity();
+  }
+
+  public double getLeftEncoderVelocity() {
+    return -leftRelativeEncoder.getVelocity();
+  }
+
+  public DifferentialDrive getDifferentialDrive() {
+    return differentialDrive;
   }
 
   // The gyro sensor
-  private final Gyro m_gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+  private final static Gyro navX = new AHRS(SPI.Port.kMXP);
+  //private final static Gyro navX = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+
+  public Gyro getGyro() {
+    return navX;
+  }
+  // private final Gyro navX = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
+
+  public DifferentialDriveOdometry getOdomotery() {
+    return m_odometry;
+  }
 
   // 2pr/(minutes/rotation)
   /**
@@ -101,15 +166,14 @@ public class DriveTrainSubsystem extends SubsystemBase {
    * @return The pose.
    */
 
-  public void setIdleMode() {
-    leftBackCANSparkMax.setIdleMode(IdleMode.kCoast);
-    leftFrontCANSparkMax.setIdleMode(IdleMode.kCoast);
-    rightBackCANSparkMax.setIdleMode(IdleMode.kCoast);
-    rightFrontCANSparkMax.setIdleMode(IdleMode.kCoast);
-  }
-
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    zeroHeading();
+    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
   }
 
   /**
@@ -123,7 +187,8 @@ public class DriveTrainSubsystem extends SubsystemBase {
     // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(),
     // m_rightEncoder.getRate());
 
-    return new DifferentialDriveWheelSpeeds(leftRelativeEncoder.getVelocity(), rightRelativeEncoder.getVelocity());
+    // NEGATE RIGHT ENCODER VALUE!!!!!!!!!!!
+    return new DifferentialDriveWheelSpeeds(getLeftEncoderVelocity(), getRightEncoderVelocity());
   }
 
   /**
@@ -131,10 +196,11 @@ public class DriveTrainSubsystem extends SubsystemBase {
    *
    * @param pose The pose to which to set the odometry.
    */
-  public void resetOdometry(Pose2d pose) {
-    resetEncoders();
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
-  }
+  // public void resetOdometry(Pose2d pose) {
+  // resetEncoders();
+
+  // m_odometry.resetPosition(pose, navX.getRotation2d());
+  // }
 
   /**
    * Drives the robot using arcade controls.
@@ -153,17 +219,16 @@ public class DriveTrainSubsystem extends SubsystemBase {
    * @param rightVolts the commanded right output
    */
   public void tankDriveVolts(double leftVolts, double rightVolts) {
-    leftMotorControllerGroup.setVoltage(leftVolts);
-    rightMotorControllerGroup.setVoltage(rightVolts);
+    leftMotorControllerGroup.setVoltage(-leftVolts);
+    rightMotorControllerGroup.setVoltage(-rightVolts);
     differentialDrive.feed();
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
-  public void resetEncoders() {
+  public static void resetEncoders() {
     // m_leftEncoder.reset();
     // m_rightEncoder.reset();
 
-    // TODO: Makre sure .setPosition(0) actually resets encoder position to 0
     leftRelativeEncoder.setPosition(0);
     rightRelativeEncoder.setPosition(0);
   }
@@ -176,9 +241,8 @@ public class DriveTrainSubsystem extends SubsystemBase {
   public double getAverageEncoderDistance() {
     // return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
 
-    // TODO: Find what getDistance() returns and see if it is the same as
-    // getPosition()
-    return (leftRelativeEncoder.getPosition() + rightRelativeEncoder.getPosition()) / 2.0;
+    // NEGATE RIGHT ENCODER VALUE!!!!!!!!!!!
+    return (getLeftEncoderPosition() + getRightEncoderPosition()) / 2.0;
   }
 
   /**
@@ -205,8 +269,6 @@ public class DriveTrainSubsystem extends SubsystemBase {
   // return m_rightEncoder;
   // }
 
-  // TODO: See what difference is in returning Encoder object vs RelativeEncoder
-  // object
   public RelativeEncoder getRightEncoder() {
     return rightRelativeEncoder;
   }
@@ -231,9 +293,18 @@ public class DriveTrainSubsystem extends SubsystemBase {
     rightBackCANSparkMax.setIdleMode(IdleMode.kBrake);
   }
 
+  public void setIdleMode() {
+    leftBackCANSparkMax.setIdleMode(IdleMode.kCoast);
+    leftFrontCANSparkMax.setIdleMode(IdleMode.kCoast);
+    rightBackCANSparkMax.setIdleMode(IdleMode.kCoast);
+    rightFrontCANSparkMax.setIdleMode(IdleMode.kCoast);
+  }
+
   /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    m_gyro.reset();
+  public static void zeroHeading() {
+    navX.calibrate();
+    navX.reset();
+
   }
 
   /**
@@ -241,8 +312,9 @@ public class DriveTrainSubsystem extends SubsystemBase {
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
-  public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
+  public static double getHeading() {
+
+    return navX.getRotation2d().getDegrees();
   }
 
   /**
@@ -251,6 +323,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return -m_gyro.getRate();
+    return -navX.getRate();
   }
+
 }

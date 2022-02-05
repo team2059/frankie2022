@@ -28,17 +28,17 @@ public final class Constants {
         public static final double kRamseteZeta = 0.7;
 
         // for paths that are coded. in pathweaver we can set these values
-        public static final double kMaxSpeedMetersPerSecond = 1;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+        public static final double kMaxSpeedMetersPerSecond = 0.25;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 0.25;
 
     }
 
     public static final class DriveConstants {
         // CAN ID Ports
-        public static int leftFrontCANSparkMaxCANId = 4;
-        public static int leftbackCANSparkMaxCANId = 3;
-        public static int rightFrontCANSparkMaxCANId = 1;
-        public static int rightBackCANSparkMaxCANId = 2;
+        public static int leftFrontCANSparkMaxCANId = 1;
+        public static int leftbackCANSparkMaxCANId = 2;
+        public static int rightFrontCANSparkMaxCANId = 4;
+        public static int rightBackCANSparkMaxCANId = 3;
 
         //
         // ratio*2*pi*Units.inchesToMeters(wheel raidus)
@@ -48,21 +48,19 @@ public final class Constants {
         // If we get the number of ticks, say 10000, we want to multiply that times
         // 1/kLinearDistancePerMotorRotation to get number of inches, not 10000 times
         // kLinearDistancePerMotorRotation
-        public static final double kLinearDistancePerMotorRotation = Units
+        public static final double kLinearDistancePerMotorRotation = (Units
                 .inchesToMeters(1 / (kFrankieGearRatio * 2 * Math.PI
-                        * Units.inchesToMeters(kFrankieWheelRadiusInches)) * 10);
+                        * Units.inchesToMeters(kFrankieWheelRadiusInches)) * 10));
 
-        // TODO: run robot characerization. The Robot Characterization Toolsuite
-        // provides a convenient tool for obtaining these
-        // values for your robot.
-        public static final double ksVolts = 0.17404;
-        public static final double kvVoltSecondsPerMeter = 3.4402;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.31508;
-        public static final double kPDriveVel = 3;
+        
+        public static final double ksVolts = 0.1219;
+        public static final double kvVoltSecondsPerMeter = 3.343;
+        public static final double kaVoltSecondsSquaredPerMeter = 1.0356;
+        public static final double kPDriveVel = 2.2662;
 
         // 22.75 inches equals 0.57785. trackwidth is horizontal distance between the
         // wheels
-        public static final double kTrackwidthMeters = Units.inchesToMeters(22.75);
+        public static final double kTrackwidthMeters = Units.inchesToMeters(23);
         // DifferentialDriveKinematics allows us to use the trackwidth to convert from
         // chassis speeds to wheel speeds. As elsewhere, we keep our units in meters.
         public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(

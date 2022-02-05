@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -28,6 +29,8 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.DriveCmd;
 import frc.robot.subsystems.DriveTrainSubsystem;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -76,7 +79,13 @@ public class RobotContainer {
    * @return the command to run in autonomous
    * @throws IOException
    */
+
   public Command getAutonomousCommand() throws IOException {
+    // set left to inverted so motors go in same direction
+    // driveTrainSubsystem.getLeftMotorControllerGroup().setInverted(true);
+    // driveTrainSubsystem.resetEncoders();
+    // driveTrainSubsystem.zeroHeading();
+
     // Create a voltage constraint to ensure we don't accelerate too fast
     var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
         new SimpleMotorFeedforward(
@@ -87,11 +96,6 @@ public class RobotContainer {
         10);
 
     // Create config for trajectory
-
-    Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve("paths/S.wpilib.json");
-    Trajectory trajectory = new Trajectory();
-    trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
@@ -101,15 +105,37 @@ public class RobotContainer {
             .addConstraint(autoVoltageConstraint);
 
     // An example trajectory to follow. All units in meters.
-    // Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-    // // Start at the origin facing the +X direction
-    // new Pose2d(0, 0, new Rotation2d(0)),
-    // // Pass through these two interior waypoints, making an 's' curve path
-    // List.of(new Translation2d(1, 1), new Translation2d(-1, 2)),
-    // // End 3 meters straight ahead of where we started, facing forward
-    // new Pose2d(3, 0, new Rotation2d(0)),
-    // // Pass config
-    // config);
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        new Pose2d(0, 0, new Rotation2d(0)),
+        // Pass through these two interior waypoints, making an 's' curve path
+        List.of(new Translation2d(1, 0), new Translation2d(1.5, 0)),
+        // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(2, 0, new Rotation2d(0)),
+        // Pass config
+        config);
+
+    Path trajectoryPath = Filesystem.getDeployDirectory().toPath()
+        .resolve("pathplanner/generatedJSON/forward2.wpilib.json");
+    Trajectory trajectory = new Trajectory();
+    trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+
+    // driveTrainSubsystem.resetOdometry(trajectory.getInitialPose());
+    // driveTrainSubsystem.getField().getObject("Pose").setTrajectory(trajectory);
+    // Rotation2d rotation2d =
+    // driveTrainSubsystem.getPose().minus(trajectory.getInitialPose());
+
+    // Transform2d rotate90 = new Pose2d(0, 0, Rotation2d.fromDegrees(90));
+    // trajectory = trajectory.transformBy(new Transform2d(new Translation2d(0.0,
+    // 0.0), Rotation2d.fromDegrees(110)));
+
+    // driveTrainSubsystem.resetOdometry(trajectory.getInitialPose());
+
+    // driveTrainSubsystem.differentialDrive.resetOdometry(trajectory.getInitialPose());
+    // transforming the PathWeaver trajectory to match your current pose
+    // var transform =
+    // driveTrainSubsystem.getPose().minus(trajectory.getInitialPose());
+    // straightTrajectory = trajectory.transformBy(transform);
 
     RamseteCommand ramseteCommand = new RamseteCommand(
         trajectory,
@@ -128,8 +154,8 @@ public class RobotContainer {
         driveTrainSubsystem);
 
     // Reset odometry to the starting pose of the trajectory.
+    // driveTrainSubsystem.resetOdometry(trajectory.getInitialPose());
     driveTrainSubsystem.resetOdometry(trajectory.getInitialPose());
-
     // Run path following command, then stop at the end via break mode to ensure no
     // voltage and then set motors to idle mode for teleOp.
     return ramseteCommand.andThen(() -> driveTrainSubsystem.setBreakMode())
