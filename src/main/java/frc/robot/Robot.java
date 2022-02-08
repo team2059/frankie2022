@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveTrainSubsystem;
+import frc.robot.subsystems.DriveTrainSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -28,7 +29,7 @@ public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  private DriveTrainSubsystem driveTrainSubsystem;
+  private DriveTrainSubsystem DriveTrainSubsystem;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -69,8 +70,8 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    DriveTrainSubsystem.zeroHeading();
-    DriveTrainSubsystem.resetEncoders();
+    // DriveTrainSubsystem.zeroHeading();
+    // DriveTrainSubsystem.resetEncoders();
 
   }
 
@@ -85,8 +86,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    driveTrainSubsystem.zeroHeading();
-    driveTrainSubsystem.resetEncoders();
+    // DriveTrainSubsystem.zeroHeading();
+    // DriveTrainSubsystem.resetEncoders();
 
     try {
       m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -105,15 +106,15 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    if (driveTrainSubsystem.getHeading() != 0) {
-      driveTrainSubsystem.zeroHeading();
-    }
+    // if (DriveTrainSubsystem.getHeading() != 0) {
+    //   DriveTrainSubsystem.zeroHeading();
+    // }
   }
 
   @Override
   public void teleopInit() {
-    driveTrainSubsystem.zeroHeading();
-    driveTrainSubsystem.resetEncoders();
+    // DriveTrainSubsystem.zeroHeading();
+    // DriveTrainSubsystem.resetEncoders();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

@@ -138,7 +138,7 @@ public class RobotContainer {
     // straightTrajectory = trajectory.transformBy(transform);
 
     RamseteCommand ramseteCommand = new RamseteCommand(
-        trajectory,
+        exampleTrajectory,
         driveTrainSubsystem::getPose,
         new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
         new SimpleMotorFeedforward(
@@ -155,7 +155,7 @@ public class RobotContainer {
 
     // Reset odometry to the starting pose of the trajectory.
     // driveTrainSubsystem.resetOdometry(trajectory.getInitialPose());
-    driveTrainSubsystem.resetOdometry(trajectory.getInitialPose());
+    driveTrainSubsystem.resetOdometry(exampleTrajectory.getInitialPose());
     // Run path following command, then stop at the end via break mode to ensure no
     // voltage and then set motors to idle mode for teleOp.
     return ramseteCommand.andThen(() -> driveTrainSubsystem.setBreakMode())
