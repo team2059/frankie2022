@@ -4,39 +4,45 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrainSubsystem;
 
-public class TeleopDriveCommand extends CommandBase {
+public class DriveCmd extends CommandBase {
 
   private final DriveTrainSubsystem driveTrainSubsystem;
-  
+
   /** Creates a new teleopDrive. */
-  public TeleopDriveCommand(DriveTrainSubsystem subsystem) {
+  public DriveCmd(DriveTrainSubsystem subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.driveTrainSubsystem = subsystem;
-    
     addRequirements(subsystem);
+
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+
     System.out.println("Starting TeleopDriveCommand");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double ySpeed = RobotContainer.joyStick.getY();
-    double zRotation = RobotContainer.joyStick.getZ();
-    driveTrainSubsystem.arcadeDrive(ySpeed, zRotation);
+    double xSpeed = RobotContainer.logitech.getRawAxis(1) * 0.5;
+    double zRotation = RobotContainer.logitech.getRawAxis(2) * 0.5;
+    // negate zRotation because we invertetd rightMotorControllerGroup
+    driveTrainSubsystem.arcadeDrive(xSpeed, zRotation);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    driveTrainSubsystem.tankDriveVolts(0, 0);
+  }
 
   // Returns true when the command should end.
   @Override
