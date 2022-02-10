@@ -35,10 +35,10 @@ public final class Constants {
 
     public static final class DriveConstants {
         // CAN ID Ports
-        public static int leftFrontCANSparkMaxCANId = 1;
-        public static int leftbackCANSparkMaxCANId = 2;
-        public static int rightFrontCANSparkMaxCANId = 4;
-        public static int rightBackCANSparkMaxCANId = 3;
+        public static int leftFrontCANSparkMaxCANId = 2;
+        public static int leftbackCANSparkMaxCANId = 1;
+        public static int rightFrontCANSparkMaxCANId = 3;
+        public static int rightBackCANSparkMaxCANId = 4;
 
         //
         // ratio*2*pi*Units.inchesToMeters(wheel raidus)
