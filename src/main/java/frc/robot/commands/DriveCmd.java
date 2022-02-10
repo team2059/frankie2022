@@ -35,7 +35,8 @@ public class DriveCmd extends CommandBase {
     double xSpeed = RobotContainer.logitech.getRawAxis(1) * 0.5;
     double zRotation = RobotContainer.logitech.getRawAxis(2) * 0.5;
     // negate zRotation because we invertetd rightMotorControllerGroup
-    driveTrainSubsystem.arcadeDrive(xSpeed, zRotation);
+    
+    driveTrainSubsystem.arcadeDrive(xSpeed, -zRotation);
   }
 
   // Called once the command ends or is interrupted.

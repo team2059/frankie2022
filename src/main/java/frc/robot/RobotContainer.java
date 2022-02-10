@@ -116,7 +116,7 @@ public class RobotContainer {
                                 config);
 
                 Path trajectoryPath = Filesystem.getDeployDirectory().toPath()
-                                .resolve("pathplanner/generatedJSON/Forward2.wpilib.json");
+                                .resolve("pathplanner/generatedJSON/Forward.wpilib.json");
                 Trajectory trajectory = new Trajectory();
                 trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
 
