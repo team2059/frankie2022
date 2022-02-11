@@ -4,16 +4,12 @@
 
 package frc.robot;
 
-import java.io.IOException;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.DriveTrainSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -93,12 +89,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.getDriveTrainSubsystem().zeroHeading();
     m_robotContainer.getDriveTrainSubsystem().resetEncoders();
 
-    try {
-      m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -125,40 +116,6 @@ public class Robot extends TimedRobot {
     DifferentialDriveOdometry myDriveOdometry = m_robotContainer.getDriveTrainSubsystem().getOdometry();
     myDriveOdometry.resetPosition(new Pose2d(), thetaPose);
 
-    // if(null == driveTrainSubsystem) {
-    // SmartDashboard.putString("driveTrainSubsystem" , "is NULLL");
-    // }
-    // driveTrainSubsystem.zeroHeading();
-    // driveTrainSubsystem.resetEncoders();
-
-    // Rotation2d thetaPose = driveTrainSubsystem.navX.getRotation2d();
-
-    // DifferentialDriveOdometry myDriveOdometry = null;
-    // try {
-    // myDriveOdometry = driveTrainSubsystem.getOdometry();
-    // }catch (NullPointerException ex){
-    // SmartDashboard.putString("myDriveOdometry" , "try catch NULLL");
-    // ex.printStackTrace();
-
-    // }
-
-    // if(null == myDriveOdometry) {
-    // SmartDashboard.putString("myDriveOdometry" , "is NULLL");
-    // }
-
-    // try{
-    // myDriveOdometry.resetPosition(new Pose2d(), thetaPose);
-    // }catch(NullPointerException exception){
-    // SmartDashboard.putString("myDriveOdometry" , "cannot reset pos");
-    // }
-    //
-
-    // driveTrainSubsystem.getOdometry().resetPosition(new Pose2d(), thetaPose);
-
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

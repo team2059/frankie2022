@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrainSubsystem;
@@ -33,9 +31,9 @@ public class DriveCmd extends CommandBase {
   @Override
   public void execute() {
     double xSpeed = RobotContainer.logitech.getRawAxis(1) * 0.5;
-    double zRotation = RobotContainer.logitech.getRawAxis(2) * 0.5;
+    double zRotation = RobotContainer.logitech.getRawAxis(0) * 0.5;
     // negate zRotation because we invertetd rightMotorControllerGroup
-    
+
     driveTrainSubsystem.arcadeDrive(xSpeed, -zRotation);
   }
 
