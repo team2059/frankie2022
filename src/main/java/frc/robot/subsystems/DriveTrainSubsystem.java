@@ -73,7 +73,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
     leftBackCANSparkMax.follow(leftFrontCANSparkMax);
     rightBackCANSparkMax.follow(rightFrontCANSparkMax);
 
-    // TODO Inverted
+    // Inverted
     rightMotorControllerGroup.setInverted(false);
     leftMotorControllerGroup.setInverted(true);
     // leftMotorControllerGroup.setInverted(true);
@@ -104,7 +104,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
     navX.calibrate();
     resetEncoders();
 
-   // navX.getRotation2d().minus(navX.getRotation2d()).minus(navX.getRotation2d());
+    // navX.getRotation2d().minus(navX.getRotation2d()).minus(navX.getRotation2d());
 
     m_odometry = new DifferentialDriveOdometry(navX.getRotation2d());
     m_odometry.resetPosition(new Pose2d(), navX.getRotation2d());
@@ -128,7 +128,6 @@ public class DriveTrainSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("x pose", m_odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("y pose", m_odometry.getPoseMeters().getY());
 
-    // TODO Investigate discrepancy between theta pose and gyro heading
     SmartDashboard.putNumber("theta pose", m_odometry.getPoseMeters().getRotation().getDegrees());
 
     // This method will be called once per scheduler run
@@ -155,7 +154,6 @@ public class DriveTrainSubsystem extends SubsystemBase {
     return -rightRelativeEncoder.getPosition();
   }
 
-  // TODO Inverted
   public double getLeftEncoderPosition() {
     return leftRelativeEncoder.getPosition();
   }
@@ -164,7 +162,6 @@ public class DriveTrainSubsystem extends SubsystemBase {
     return -rightRelativeEncoder.getVelocity();
   }
 
-  // TODO Inverted
   public double getLeftEncoderVelocity() {
     return leftRelativeEncoder.getVelocity();
   }
@@ -249,7 +246,6 @@ public class DriveTrainSubsystem extends SubsystemBase {
    * @param rightVolts the commanded right output
    */
 
-  // TODO Inverted
   public void tankDriveVolts(double leftVolts, double rightVolts) {
     leftMotorControllerGroup.setVoltage(-leftVolts);
     rightMotorControllerGroup.setVoltage(-rightVolts);
@@ -345,7 +341,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public static double getHeading() {
-    //return 0;
+    // return 0;
     return navX.getRotation2d().getDegrees();
   }
 
