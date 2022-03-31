@@ -40,7 +40,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
   CANSparkMax rightBackCANSparkMax = new CANSparkMax(DriveConstants.rightBackCANSparkMaxCANId,
       CANSparkMaxLowLevel.MotorType.kBrushless);
 
-  WPI_TalonSRX testTalon = new WPI_TalonSRX(0);
+  //WPI_TalonSRX testTalon = new WPI_TalonSRX(0);
 
   // using built in encoders in NEO motors
   private final static RelativeEncoder leftRelativeEncoder = leftFrontCANSparkMax.getEncoder();
