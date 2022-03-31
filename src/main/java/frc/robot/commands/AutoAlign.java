@@ -5,43 +5,38 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrainSubsystem;
+import frc.robot.subsystems.Vision;
 
-public class DriveCmd extends CommandBase {
-
+public class AutoAlign extends CommandBase {
+  private final Vision vision;
   private final DriveTrainSubsystem driveTrainSubsystem;
-
-  /** Creates a new teleopDrive. */
-  public DriveCmd(DriveTrainSubsystem subsystem) {
+  private double speed = 0.0;
+  /** Creates a new AutoAlign. */
+  public AutoAlign(Vision vision, DriveTrainSubsystem driveTrainSubsystem) {
+    this.vision = vision;
+    this.driveTrainSubsystem = driveTrainSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
-    this.driveTrainSubsystem = subsystem;
-    addRequirements(subsystem);
-
+    addRequirements(vision, driveTrainSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-
-    //System.out.println("Starting TeleopDriveCommand");
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double xSpeed = RobotContainer.m_joystick.getRawAxis(1) * 0.5;
-    double zRotation = RobotContainer.m_joystick.getRawAxis(0) * 0.5;
-    // negate zRotation because we invertetd rightMotorControllerGroup
+    System.out.println("Starting AutoAlign");
+    System.out.println(vision.getTargetAngle());
+    speed = vision.getTargetAngle() * 0.075;
 
-    driveTrainSubsystem.arcadeDrive(xSpeed, -zRotation);
+    driveTrainSubsystem.arcadeDrive(0, -(speed*0.5));
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    driveTrainSubsystem.tankDriveVolts(0, 0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
